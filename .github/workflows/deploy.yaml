@@ -1,8 +1,9 @@
-name: Deploy Node.js App to AWS ec3
+name: Deploy Node.js App to AWS EC2
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
   deploy:
@@ -13,12 +14,15 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Deploy via SSH
-        uses: appleboy/ssh-action@v0.1.5
+        uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
+          username: ubuntu
           key: ${{ secrets.SSH_KEY }}
+          port: 22
+          debug: true
           script: |
-            cd ~/nodejs-app-deploy
-            git pull
+            set -e
+            cd /home/ubuntu/nodejs-app-deploy
+            git pull origin main
             sudo docker compose up -d --build
